@@ -7,13 +7,18 @@
 <script src="/socket.io/socket.io.js"></script>
 
 <script>
-    const socket = io();
-    socket.emit('test');
 
-    // Listen for the 'connect' event
-    socket.on('connect', () => {
-        console.log('Connected to the backend server on:', backendUrl);
+    // const socket = io();
+    // Replace 'userId' with the actual user Id you want to pass
+    const userId = '123456789';
+    const socket = io({
+        query: {
+            userId: userId
+        }
     });
+    // Now you can use the socket connection with the user name
+    // For example, to send a message to the server:
+    socket.emit(userId, 'Hello Server!');
 
 </script>
 
