@@ -1,6 +1,6 @@
+var reminderService = require('../service/reminderService');
 
 module.exports = function (router) {
-    router.get('/test', (req, res) => {
-        res.send("PRIVATE");
-    });
+    router.post('/reminders', reminderService.saveReminder);
+    router.get('/reminders', reminderService.getReminders);
 };

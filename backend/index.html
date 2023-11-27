@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Hello!</title>
+</head>
+<script src="/socket.io/socket.io.js"></script>
+
+<script>
+    const socket = io();
+    socket.emit('test');
+
+    // Listen for the 'connect' event
+    socket.on('connect', () => {
+        console.log('Connected to the backend server on:', backendUrl);
+    });
+
+</script>
+
+<body>Integrating Socket.io with Node.js and Express</body>
+
+</html>

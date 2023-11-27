@@ -8,6 +8,16 @@ const keycloakConfig = require('./config/keycloak-config.js').keycloakConfig;
 const privateRouter = require('./router/router.js');
 const publicRouter = require('./router/public.js');
 
+const http = require('http');
+const socketIO = require('socket.io')
+const server = http.createServer(app);
+const io = socketIO(server, {
+    cors: {
+        origin: "http://localhost:3000"
+    }
+});
+
+
 // Create a session-store to be used by both the express-session
 // middleware and the keycloak middleware.
 const memoryStore = new session.MemoryStore();
@@ -47,6 +57,8 @@ db();
 // Enable Cross-Origin Resource Sharing (CORS) middleware
 app.use(cors());
 
+app.use(express.json());
+
 // Middleware to set Access-Control-Expose-Headers globally(allows custom headers)
 app.use((req, res, next) => {
     res.header('Access-Control-Expose-Headers', '*');
@@ -62,6 +74,21 @@ var public = express.Router();
 app.use('/api', keycloak.protect(), router);
 app.use(public);
 
+app.get('/', function (req, res) {
+    res.sendfile('index.html');
+});
+
+
+io.on('connection', (socket) => {
+    console.log('user connected');
+    socket.on('disconnect', function () {
+        console.log('user disconnected');
+    });
+    socket.on('test', function () {
+        console.log('testinggg');
+    });
+})
+
 //call routing
 privateRouter(router);
 publicRouter(public);
@@ -69,7 +96,7 @@ publicRouter(public);
 
 const PORT = process.env.SERVER_PORT;
 
-app.listen(PORT, (error) => {
+server.listen(PORT, (error) => {
     if (!error)
         console.log("Server is Successfully Running, and App is listening on port " + PORT)
     else
