@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 const cors = require('cors');
+const path = require('path');
 const db = require('./config/database');
 const session = require('express-session');
 const Keycloak = require('keycloak-connect');
@@ -8,6 +9,13 @@ const keycloakConfig = require('./config/keycloak-config.js').keycloakConfig;
 const privateRouter = require('./router/router.js');
 const publicRouter = require('./router/public.js');
 
+/**
+    WebSocket is a separate protocol from HTTP, 
+    and to use it in your application, you need to create 
+    a WebSocket server in addition to the HTTP server.
+    This is why you are creating an HTTP server with http.
+    createServer(app) and then passing it to socketIO to create a WebSocket server.
+*/
 const http = require('http');
 const socketIO = require('socket.io')
 const server = http.createServer(app);
@@ -75,19 +83,25 @@ app.use('/api', keycloak.protect(), router);
 app.use(public);
 
 app.get('/', function (req, res) {
-    res.sendfile('index.html');
+    res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 
 io.on('connection', (socket) => {
-    console.log('user connected');
-    socket.on('disconnect', function () {
-        console.log('user disconnected');
+    // Access user ID from handshake query
+    const userId = socket.handshake.query.userId;
+
+    console.log(`User ${userId} connected`);
+
+    socket.on('disconnect', () => {
+        console.log(`User ${userId} disconnected`);
     });
-    socket.on('test', function () {
-        console.log('testinggg');
+
+    // Listen for messages from this specific user
+    socket.on(userId, (message) => {
+        console.log(`Received message from user ${userId}: ${message}`);
     });
-})
+});
 
 //call routing
 privateRouter(router);
