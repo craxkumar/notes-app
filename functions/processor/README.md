@@ -15,7 +15,20 @@ library, and it can be invoked from your browser or from the command line:
 curl http://myfunction.example.com/
 ```
 
-### How to run this func ?
+## How to run this function ?
+
+#### Running using go cmd :
+
+1. Change "package function" to "package main"
+2. Run the function using "go run handle.go"
+
+```
+go run handle.go
+```
+
+#### Running using func[knative] cmd :
+1. Change "package main" to "package function"
+2. Run the function using "func run"
 
 ```
 func run

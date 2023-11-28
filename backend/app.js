@@ -8,6 +8,7 @@ const Keycloak = require('keycloak-connect');
 const keycloakConfig = require('./config/keycloak-config.js').keycloakConfig;
 const privateRouter = require('./router/router.js');
 const publicRouter = require('./router/public.js');
+const cronJob = require('./utility/cronJob.js');
 
 /**
     WebSocket is a separate protocol from HTTP, 
@@ -107,6 +108,8 @@ io.on('connection', (socket) => {
 privateRouter(router);
 publicRouter(public);
 
+// run cron Job
+cronJob();
 
 const PORT = process.env.SERVER_PORT;
 
