@@ -20,6 +20,7 @@
     "http": "^0.0.1-security",
     "keycloak-connect": "^23.0.0",
     "moment": "^2.29.4",
+    "moment-timezone": "^0.5.43",
     "mongoose": "^8.0.1",
     "node-cron": "^3.0.3",
     "socket.io": "^4.7.2"
