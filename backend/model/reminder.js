@@ -39,4 +39,10 @@ var reminderSchema = new Schema(
     },
 );
 
+// Add separate indexes on the user_id, expired and date fields
+reminderSchema.index({ user_id: 1 });
+reminderSchema.index({ expired: 1 });
+reminderSchema.index({ date: 1 });
+
+
 module.exports = reminderSchema;
