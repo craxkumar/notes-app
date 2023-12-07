@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+    name: keycloak
+    namespace: notes-app
+spec:
+    # volumeClaimTemplates: []
+    replicas: 1
+    serviceName: keycloak
+    selector:
+        matchLabels:
+            app: keycloak
+    template:
+        metadata:
+            labels:
+                app: keycloak
+        spec:
+            containers:
+                - name: keycloak
+                  image: quay.io/keycloak/keycloak:20.0.1
+                  args: ['start-dev --import-realm']
+                  env:
+                      - name: KEYCLOAK_ADMIN
+                        value: 'admin'
+                      - name: KEYCLOAK_ADMIN_PASSWORD
+                        value: 'admin'
+                      - name: KC_DB
+                        value: postgres
+                      - name: KC_DB_URL_HOST
+                        value: keycloak-postgresql.notes-app.svc.cluster.local
+                      - name: KC_DB_USERNAME
+                        value: keycloak
+                      - name: KC_DB_PASSWORD
+                        valueFrom:
+                            secretKeyRef:
+                                name: keycloak-postgresql
+                                key: postgresql-password
+                  ports:
+                      - name: http
+                        containerPort: 8080
+                      - name: https
+                        containerPort: 8443
+                  readinessProbe:
+                      httpGet:
+                          path: /realms/master
+                          port: 8080
+                  volumeMounts:
+                      - name: keycloak-volume
+                        mountPath: /opt/keycloak/data/import
+            volumes:
+                - name: keycloak-volume
+                  configMap:
+                      name: keycloak-config

@@ -1,0 +1,91 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+    name: backend-mongodb
+    namespace: notes-app
+spec:
+    serviceName: backend-mongodb
+    replicas: 1
+    selector:
+        matchLabels:
+            app: backend-mongodb
+    template:
+        metadata:
+            labels:
+                app: backend-mongodb
+        spec:
+            containers:
+                - name: mongodb
+                  image: mongo:6.0.5
+                  imagePullPolicy: 'IfNotPresent'
+                  env:
+                      - name: DATA_PATH
+                        value: /data/db
+                      - name: PORT
+                        value: '27017'
+                  ports:
+                      - name: peer
+                        containerPort: 27017
+                  command:
+                      - mongod
+                  args:
+                      - --dbpath=$(DATA_PATH)
+                      - --port=$(PORT)
+                      - --bind_ip=0.0.0.0
+                  livenessProbe:
+                      exec:
+                          command:
+                              - mongosh
+                              - --eval
+                              - "db.adminCommand('ping')"
+                      initialDelaySeconds: 30
+                      timeoutSeconds: 5
+                      failureThreshold: 3
+                      periodSeconds: 10
+                      successThreshold: 1
+                  readinessProbe:
+                      exec:
+                          command:
+                              - mongosh
+                              - --eval
+                              - "db.adminCommand('ping')"
+                      initialDelaySeconds: 30
+                      timeoutSeconds: 5
+                      failureThreshold: 3
+                      periodSeconds: 10
+                      successThreshold: 1
+                  volumeMounts:
+                      - name: datadir
+                        mountPath: /data/db
+                  resources:
+                      requests:
+                          memory: '512Mi'
+                          cpu: '500m'
+                      limits:
+                          memory: '1Gi'
+                          cpu: '1'
+            volumes:
+    volumeClaimTemplates:
+        - metadata:
+              name: datadir
+          spec:
+              accessModes: ['ReadWriteOnce']
+              resources:
+                  requests:
+                      storage: '1Gi'
+---
+# Headless service for DNS record
+apiVersion: v1
+kind: Service
+metadata:
+    name: backend-mongodb
+    namespace: notes-app
+spec:
+    type: ClusterIP
+    clusterIP: None
+    publishNotReadyAddresses: true
+    ports:
+        - name: peer
+          port: 27017
+    selector:
+        app: backend-mongodb
