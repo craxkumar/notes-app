@@ -21,7 +21,6 @@ function App() {
   const toastIdRef = useRef();
 
   useEffect(() => {
-    // Define the MongoDB endpoint URL (replace with your actual endpoint)
     const token = auth?.user?.access_token;
     if (token) {
       fetch(process.env.REACT_APP_API_BASE_URL + "/api/reminders", {
@@ -39,18 +38,63 @@ function App() {
     }
   }, [auth.isAuthenticated]);
 
+  // useEffect(() => {
+  //   if (schedules.length > 0) {
+  //     socket.on(auth?.user?.profile?.sub, (data) => {
+  //       console.log(data, schedules, "popopopop");
+  //       const existingScheduleIndex = schedules.findIndex(
+  //         (schedule) => schedule._id === data._id
+  //       );
+
+  //       if (existingScheduleIndex !== -1) {
+  //         var updatedSchedules = [...schedules];
+  //         updatedSchedules[existingScheduleIndex] = {
+  //           ...updatedSchedules[existingScheduleIndex],
+  //           ...data,
+  //         };
+  //       }
+  //       setSchedules(updatedSchedules);
+  //       toastIdRef.current = toast({
+  //         title: `It's Time for ${data.title}`,
+  //         status: "success",
+  //         duration: 5000,
+  //         variant: "left-accent",
+  //         isClosable: true,
+  //       });
+  //     });
+  //   }
+  // });
+
   useEffect(() => {
-    socket.on("notification", (data) => {
-      toast.close(toastIdRef.current);
-      toastIdRef.current = toast({
-        title: `Time for ${data.title}`,
-        status: "success",
-        duration: 5000,
-        variant: "left-accent",
-        isClosable: true,
+    if (schedules.length > 0 && socket) {
+      socket.on(auth?.user?.profile?.sub, (data) => {
+        const existingScheduleIndex = schedules.findIndex(
+          (schedule) => schedule._id === data._id
+        );
+
+        if (
+          existingScheduleIndex !== -1 &&
+          !schedules[existingScheduleIndex].expired
+        ) {
+          const updatedSchedules = [...schedules];
+          updatedSchedules[existingScheduleIndex] = {
+            ...updatedSchedules[existingScheduleIndex],
+            expired: true,
+          };
+
+          setSchedules(updatedSchedules);
+
+          toastIdRef.current = toast({
+            title: `It's Time for ${data.title}`,
+            status: "success",
+            duration: 5000,
+            variant: "left-accent",
+            isClosable: true,
+          });
+        }
       });
-    });
-  });
+    }
+  }, [schedules, socket, auth]);
 
   return (
     <Router className="flex h-screen">
