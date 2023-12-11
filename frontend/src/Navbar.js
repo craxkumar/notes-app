@@ -16,12 +16,11 @@ import { Link } from "react-router-dom";
 import ReminderFormModal from "./Modal/ReminderFormModal";
 import { useAuth } from "react-oidc-context";
 
-const Header = ({ socket, schedules }) => {
+const Header = ({ socket, schedules, setSchedules }) => {
   const location = useLocation();
   const auth = useAuth();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  console.log(auth);
   const userData = {
     name: auth?.user?.profile?.name,
     email: auth?.user?.profile?.email,
@@ -33,8 +32,6 @@ const Header = ({ socket, schedules }) => {
 
   const onSave = (data) => {
     // socket.emit("newEvent", data);
-    console.log("Reminder data:", data);
-    console.log(auth?.user?.access_token);
     fetch(process.env.REACT_APP_API_BASE_URL + "/api/reminders", {
       method: "post",
       headers: {
@@ -45,8 +42,9 @@ const Header = ({ socket, schedules }) => {
       },
       body: JSON.stringify(data),
     })
+      .then((result) => result.json())
       .then((result) => {
-        console.log("hiii");
+        setSchedules((prevSchedules) => [...prevSchedules, result]);
       })
       .catch((error) => console.error(error));
   };

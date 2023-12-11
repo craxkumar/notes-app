@@ -6,8 +6,11 @@ import socketIO from "socket.io-client";
 import { useToast } from "@chakra-ui/react";
 import Dashboard from "./Dashboard.js";
 import PrivateRoute from "./config/auth/privateRoute.js";
+import { useAuth } from "react-oidc-context";
+
 const socket = socketIO.connect(process.env.REACT_APP_PROJECT_URL);
 function App() {
+  const auth = useAuth();
   const [schedules, setSchedules] = useState([]);
   const toast = useToast({
     containerStyle: {
@@ -16,9 +19,28 @@ function App() {
     },
   });
   const toastIdRef = useRef();
+
+  useEffect(() => {
+    // Define the MongoDB endpoint URL (replace with your actual endpoint)
+    const token = auth?.user?.access_token;
+    if (token) {
+      fetch(process.env.REACT_APP_API_BASE_URL + "/api/reminders", {
+        method: "get",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      })
+        .then((result) => result.json())
+        .then((result) => {
+          setSchedules(result);
+        })
+        .catch((error) => console.error(error));
+    }
+  }, [auth.isAuthenticated]);
+
   useEffect(() => {
     socket.on("sendSchedules", (schedules) => {
-      console.log(schedules);
       setSchedules(schedules);
     });
 
@@ -32,11 +54,15 @@ function App() {
         isClosable: true,
       });
     });
-  }, []);
+  });
 
   return (
     <Router className="flex h-screen">
-      <Navbar socket={socket} schedules={schedules} />
+      <Navbar
+        socket={socket}
+        schedules={schedules}
+        setSchedules={setSchedules}
+      />
       <Switch>
         <Route exact path="/dashboard">
           <PrivateRoute>

@@ -11,13 +11,36 @@ import {
 
 const EventPopup = ({ isOpen, onClose, event }) => {
   if (!event) {
-    return null;
+    return <></>;
   }
 
-  const formatDate = (dateString) => {
-    const options = { year: "numeric", month: "2-digit", day: "2-digit" };
-    return new Date(dateString).toLocaleDateString(undefined, options);
+  const formatDateTime = (dateTimeString) => {
+    const eventDate = new Date(dateTimeString);
+
+    if (isNaN(eventDate.getTime())) {
+      return { formattedDate: "Invalid Date", formattedTime: "Invalid Time" };
+    }
+
+    const localEventDate = new Date(
+      eventDate.toLocaleString("en-US", { timeZone: "UTC" })
+    );
+
+    const formattedDate = localEventDate.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+
+    const formattedTime = localEventDate.toLocaleTimeString("en-US", {
+      hour: "numeric",
+      minute: "numeric",
+      hour12: true,
+    });
+
+    return { formattedDate, formattedTime };
   };
+
+  const { formattedDate, formattedTime } = formatDateTime(event.date);
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="md">
@@ -26,8 +49,8 @@ const EventPopup = ({ isOpen, onClose, event }) => {
         <ModalHeader>{event.title}</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <Text>Date: {formatDate(event.date)}</Text>{" "}
-          <Text>Time: {event.time}</Text>
+          <Text>Date: {formattedDate}</Text>
+          <Text>Time: {formattedTime}</Text>
           <Text>Description: {event.description}</Text>
         </ModalBody>
       </ModalContent>

@@ -14,17 +14,19 @@ const Dashboard = ({ schedules }) => {
     setSelectedEvent(null);
   };
 
-  const currentDate = new Date();
+  // const currentDate = new Date();
 
-  const expiredReminders = schedules.filter((event) => {
-    const eventDate = new Date(`${event.date} ${event.time}`);
-    return eventDate <= currentDate;
-  });
+  // const expiredReminders = schedules.filter((event) => {
+  //   console.log(event);
+  //   const eventDate = new Date(`${event.date} ${event.time}`);
+  //   return eventDate <= currentDate;
+  // });
 
-  const upcomingReminders = schedules.filter((event) => {
-    const eventDate = new Date(`${event.date} ${event.time}`);
-    return eventDate > currentDate;
-  });
+  // const upcomingReminders = schedules.filter((event) => {
+  //   console.log(event.date, "popopop");
+  //   const eventDate = new Date(`${event.date} ${event.time}`);
+  //   return eventDate > currentDate;
+  // });
 
   return (
     <Box p={4}>
@@ -32,43 +34,47 @@ const Dashboard = ({ schedules }) => {
         Dashboard
       </Text>
 
-      {upcomingReminders.length > 0 && (
+      {schedules.length > 0 && (
         <>
           <Text fontSize="lg" fontWeight="bold" mb={2}>
             Upcoming Reminders
           </Text>
           <Divider mb={4} />
           <Grid templateColumns="repeat(auto-fill, minmax(250px, 1fr))" gap={4}>
-            {upcomingReminders.map((event) => (
-              <EventCard
-                key={event.title}
-                event={event}
-                onCardClick={() => handleCardClick(event)}
-              />
-            ))}
+            {schedules
+              .filter((event) => event.expired === false)
+              .map((event) => (
+                <EventCard
+                  key={event.title}
+                  event={event}
+                  onCardClick={() => handleCardClick(event)}
+                />
+              ))}
           </Grid>
         </>
       )}
 
-      {expiredReminders.length > 0 && (
+      {schedules.length > 0 && (
         <>
           <Text
             fontSize="lg"
             fontWeight="bold"
             mb={2}
-            mt={upcomingReminders.length > 0 ? 8 : 0}
+            mt={schedules.length > 0 ? 8 : 0}
           >
             Expired Reminders
           </Text>
           <Divider mb={4} />
           <Grid templateColumns="repeat(auto-fill, minmax(250px, 1fr))" gap={4}>
-            {expiredReminders.map((event) => (
-              <EventCard
-                key={event.title}
-                event={event}
-                onCardClick={() => handleCardClick(event)}
-              />
-            ))}
+            {schedules
+              .filter((event) => event.expired === true)
+              .map((event) => (
+                <EventCard
+                  key={event.title}
+                  event={event}
+                  onCardClick={() => handleCardClick(event)}
+                />
+              ))}
           </Grid>
         </>
       )}
