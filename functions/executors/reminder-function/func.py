@@ -51,8 +51,8 @@ def process_reminder():
             # Example: Update the reminder to mark it as expired
         update_reminder_as_expired(reminder)
 
-            # Make a call to another service with the processed data
-            send_to_go_service(reminder_data)
+        # Make a call to another service with the processed data
+        # send_to_go_service(reminder_data)
         print('Reminder processed successfully:', reminder)
 
         return jsonify({'message': 'Reminders processed successfully'}), 200
@@ -60,14 +60,14 @@ def process_reminder():
         print('Error processing reminders:', str(e))
         return jsonify({'error': 'Internal Server Error'}), 500
 
-def send_to_go_service(reminder_data):
-    try:
-        # Make a POST request to the Go service
-        response = requests.post('http://localhost:5004/process', json=reminder_data)
-        response.raise_for_status()
-        print('Sent data to Go service successfully:', response.json())
-    except requests.exceptions.RequestException as e:
-        print('Error sending data to Go service:', str(e))
+# def send_to_go_service(reminder_data):
+#     try:
+#         # Make a POST request to the Go service
+#         response = requests.post('http://localhost:5004/process', json=reminder_data)
+#         response.raise_for_status()
+#         print('Sent data to Go service successfully:', response.json())
+#     except requests.exceptions.RequestException as e:
+#         print('Error sending data to Go service:', str(e))
 
 if __name__ == '__main__':
     # Start the processor on port 5002
