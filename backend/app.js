@@ -23,8 +23,10 @@ const socketIO = require('socket.io')
 const server = http.createServer(app);
 const io = socketIO(server, {
     cors: {
-        origin: process.env.FRONTEND_URL
-    }
+        origin: process.env.FRONTEND_URL,
+        methods: ["PUT", "GET", "POST", "DELETE", "OPTIONS"],
+        credentials: false
+      }
 });
 
 
@@ -88,22 +90,27 @@ app.get('/', function (req, res) {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
+// Assuming you have defined the 'io' object somewhere in your code
+app.post('/emitter', (req, res) => {
+    try {
+        // Assuming you get the list of reminder objects in the request body
+        const reminderList = req.body;
 
-io.on('connection', (socket) => {
-    // Access user ID from handshake query
-    const userId = socket.handshake.query.userId;
+        // Assuming each reminder in the list has a unique '_id' property
+        reminderList.forEach(reminder => {
+            // Emitting data with the '_id' as the event name
+            io.emit(reminder._id, reminder);
+        });
 
-    console.log(`User ${userId} connected`);
-
-    socket.on('disconnect', () => {
-        console.log(`User ${userId} disconnected`);
-    });
-
-    // Listen for messages from this specific user
-    socket.on(userId, (message) => {
-        console.log(`Received message from user ${userId}: ${message}`);
-    });
+        res.send('Message sent to the specified user');
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).send('Internal Server Error');
+    }
 });
+
+// Assuming you have body-parser middleware or similar to parse JSON in the request body
+app.use(express.json());
 
 //call routing
 privateRouter(router);

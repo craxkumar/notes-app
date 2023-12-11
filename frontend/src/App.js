@@ -8,7 +8,7 @@ import Dashboard from "./Dashboard.js";
 import PrivateRoute from "./config/auth/privateRoute.js";
 import { useAuth } from "react-oidc-context";
 
-const socket = socketIO.connect(process.env.REACT_APP_PROJECT_URL);
+const socket = socketIO.connect(process.env.REACT_APP_API_BASE_URL);
 function App() {
   const auth = useAuth();
   const [schedules, setSchedules] = useState([]);
@@ -40,10 +40,6 @@ function App() {
   }, [auth.isAuthenticated]);
 
   useEffect(() => {
-    socket.on("sendSchedules", (schedules) => {
-      setSchedules(schedules);
-    });
-
     socket.on("notification", (data) => {
       toast.close(toastIdRef.current);
       toastIdRef.current = toast({
