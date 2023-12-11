@@ -6,7 +6,7 @@ import socketIO from "socket.io-client";
 import { useToast } from "@chakra-ui/react";
 import Dashboard from "./Dashboard.js";
 import PrivateRoute from "./config/auth/privateRoute.js";
-const socket = socketIO.connect("http://localhost:4000");
+const socket = socketIO.connect(process.env.REACT_APP_PROJECT_URL);
 function App() {
   const [schedules, setSchedules] = useState([]);
   const toast = useToast({
