@@ -51,8 +51,8 @@ def process_reminder():
             # Example: Update the reminder to mark it as expired
         update_reminder_as_expired(reminder)
 
-            # Make a call to another service with the processed data
-            # send_to_go_service(reminder_data)
+        # Make a call to another service with the processed data
+        # send_to_go_service(reminder_data)
         print('Reminder processed successfully:', reminder)
 
         return jsonify({'message': 'Reminders processed successfully'}), 200

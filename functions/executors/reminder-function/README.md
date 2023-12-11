@@ -27,3 +27,20 @@ as you add business logic to your function in order to test its behavior.
 ```console
 python test_func.py
 ```
+## HOW TO RUN IT LOCALLY ?
+
+Run the below command to create a virtual env.
+```
+virtualenv venv --python=python3
+```
+
+Run the below command to install the requirements.
+```
+pip3 install -r requirements.txt
+```
+
+Run the function using below cmd:
+
+```
+python3 func.py 
+```
