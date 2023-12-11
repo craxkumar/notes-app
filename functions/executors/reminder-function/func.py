@@ -38,9 +38,16 @@ def process_reminder():
             reminder['expired'] = True
 
 
-        print('Reminders processed successfully:', jsonify(reminders))
+        api_url = 'http://localhost:3001/emitter'
+        response = requests.post(api_url, jsonify(reminders))
 
-        return jsonify(reminders), 200
+        if response.status_code == 200:
+            print('Reminders processed successfully')
+            return jsonify(reminders), 200
+        else:
+            print(f'Error processing reminders. Status code: {response.status_code}')
+            return jsonify({'error': 'Internal Server Error'}), 500
+
     except Exception as e:
         print('Error processing reminders:', str(e))
         return jsonify({'error': 'Internal Server Error'}), 500

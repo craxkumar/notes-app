@@ -21,7 +21,6 @@ function App() {
   const toastIdRef = useRef();
 
   useEffect(() => {
-    // Define the MongoDB endpoint URL (replace with your actual endpoint)
     const token = auth?.user?.access_token;
     if (token) {
       fetch(process.env.REACT_APP_API_BASE_URL + "/api/reminders", {
@@ -41,9 +40,20 @@ function App() {
 
   useEffect(() => {
     socket.on("notification", (data) => {
-      toast.close(toastIdRef.current);
+      const existingScheduleIndex = schedules.findIndex(
+        (schedule) => schedule._id === data._id
+      );
+
+      if (existingScheduleIndex !== -1) {
+        var updatedSchedules = [...schedules];
+        updatedSchedules[existingScheduleIndex] = {
+          ...updatedSchedules[existingScheduleIndex],
+          ...data,
+        };
+      }
+      setSchedules(updatedSchedules);
       toastIdRef.current = toast({
-        title: `Time for ${data.title}`,
+        title: `It's Time for ${data.title}`,
         status: "success",
         duration: 5000,
         variant: "left-accent",
