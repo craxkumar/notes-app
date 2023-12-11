@@ -38,18 +38,18 @@ func main() {
 	})
 
 	// Run Handle function every 10 seconds in a goroutine
-	go func() {
-		ticker := time.NewTicker(10 * time.Second)
-		defer ticker.Stop()
+	// go func() {
+	// 	ticker := time.NewTicker(10 * time.Second)
+	// 	defer ticker.Stop()
 
-		for {
-			select {
-			case <-ticker.C:
-				ctx := context.Background()
-				Handle(ctx, nil, nil) // You can pass nil or mock objects here
-			}
-		}
-	}()
+	// 	for {
+	// 		select {
+	// 		case <-ticker.C:
+	// 			ctx := context.Background()
+	// 			Handle(ctx, nil, nil) // You can pass nil or mock objects here
+	// 		}
+	// 	}
+	// }()
 
 	/*
 	http.HandleFunc("/", func(res http.ResponseWriter, req *http.Request) {
