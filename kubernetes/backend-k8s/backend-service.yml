@@ -10,19 +10,24 @@ spec:
       - image: raxkumar/notes-backend
         ports:
           - containerPort: 3001
-        # imagePullPolicy: IfNotPresent  # Set the imagePullPolicy here
-        # readinessProbe:
-        #   httpGet:
-        #     path: /test  # Adjust this path based on your application's readiness check endpoint
-        #     port: 3001
-        #   initialDelaySeconds: 5
-        #   periodSeconds: 50
         env:
         - name: MONGODB_DATABASE
           value: "notes-db"
-        - name: MONGODB_DATABASE
+        - name: DB_URI
           value: "mongodb://backend-mongodb-0.backend-mongodb.notes-app:27017"
         - name: KC_HOST
           value: "http://172.17.0.2:30001"
         - name: SERVER_PORT
           value: "3001"
+        readinessProbe:
+            httpGet:
+                path: /test
+                port: http
+            # initialDelaySeconds: 20
+            # periodSeconds: 15
+            # failureThreshold: 6
+        livenessProbe:
+            httpGet:
+                path: /test
+                port: http
+            # initialDelaySeconds: 120
