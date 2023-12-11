@@ -1,0 +1,33 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: notes-backend
+  namespace: notes-app
+spec:
+  template:
+    spec:
+      containers:
+        - image: harsha060201/notes-frontend
+          ports:
+            - containerPort: 3000
+          env:
+            - name: REACT_APP_OIDC_AUTHORITY
+              value: "http://localhost:9080/realms/notes"
+            - name: REACT_APP_OIDC_CLIENT_ID
+              value: "notes"
+            - name: REACT_APP_PROJECT_URL
+              value: "http://localhost:3000/"
+            - name: REACT_APP_API_BASE_URL
+              value: "http://localhost:3001"
+          readinessProbe:
+            httpGet:
+              path: /test
+              port: http
+            # initialDelaySeconds: 20
+            # periodSeconds: 15
+            # failureThreshold: 6
+          livenessProbe:
+            httpGet:
+              path: /test
+              port: http
+            # initialDelaySeconds: 120
