@@ -6,6 +6,13 @@ import { ChakraProvider } from "@chakra-ui/react";
 import { extendTheme } from "@chakra-ui/react";
 import { buttonTheme } from "./styles/Button";
 import "@fontsource/poppins";
+import { AuthProvider } from "react-oidc-context";
+
+const oidcConfig = {
+  authority: process.env.REACT_APP_OIDC_AUTHORITY,
+  client_id: process.env.REACT_APP_OIDC_CLIENT_ID,
+  redirect_uri: process.env.REACT_APP_PROJECT_URL,
+};
 
 export const theme = extendTheme({
   components: {
@@ -15,7 +22,9 @@ export const theme = extendTheme({
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-  <ChakraProvider theme={theme}>
-    <App />
-  </ChakraProvider>
+  <AuthProvider {...oidcConfig}>
+    <ChakraProvider theme={theme}>
+      <App />
+    </ChakraProvider>
+  </AuthProvider>
 );
