@@ -99,7 +99,7 @@ app.post('/emitter', (req, res) => {
         // Assuming each reminder in the list has a unique '_id' property
         reminderList.forEach(reminder => {
             // Emitting data with the '_id' as the event name
-            io.emit(reminder._id, reminder);
+            io.emit(reminder.user_id, reminder);
         });
 
         res.send('Message sent to the specified user');
