@@ -91,10 +91,9 @@ app.get("/", function (req, res) {
 // Assuming you have defined the 'io' object somewhere in your code
 app.post("/emitter", (req, res) => {
   try {
-    console.log("hiiii", req.body);
     // Assuming you get the list of reminder objects in the request body
     const reminderList = req.body?.reminder;
-
+    
     // Assuming each reminder in the list has a unique '_id' property
     reminderList.forEach((reminder) => {
       // Emitting data with the 'user_id' as the event name

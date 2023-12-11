@@ -68,30 +68,22 @@ function App() {
   useEffect(() => {
     if (schedules.length > 0 && socket) {
       socket.on(auth?.user?.profile?.sub, (data) => {
-        console.log(data, schedules, "popopopop");
-        var dataObject = {
-          _id: data._id.$oid,
-          title: data.title,
-          description: data.description,
-          user_id: data.user_id,
-          expired: data.expired,
-          date: data.date.$date,
-          createdAt: data.createdAt.$date,
-          updatedAt: data.updatedAt.$date,
-          __v: data.__v,
-        };
         const existingScheduleIndex = schedules.findIndex(
-          (schedule) => schedule._id === dataObject._id
+          (schedule) => schedule._id === data._id
         );
 
-        if (existingScheduleIndex !== -1) {
-          var updatedSchedules = [...schedules];
+        if (
+          existingScheduleIndex !== -1 &&
+          !schedules[existingScheduleIndex].expired
+        ) {
+          const updatedSchedules = [...schedules];
           updatedSchedules[existingScheduleIndex] = {
             ...updatedSchedules[existingScheduleIndex],
-            ...data,
+            expired: true,
           };
-          console.log(updatedSchedules, "lplplpl");
+
           setSchedules(updatedSchedules);
+
           toastIdRef.current = toast({
             title: `It's Time for ${data.title}`,
             status: "success",
