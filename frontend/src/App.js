@@ -67,6 +67,8 @@ function App() {
 
   useEffect(() => {
     if (schedules.length > 0 && socket) {
+      socket.removeAllListeners(auth?.user?.profile?.sub);
+
       socket.on(auth?.user?.profile?.sub, (data) => {
         const existingScheduleIndex = schedules.findIndex(
           (schedule) => schedule._id === data._id
