@@ -13,6 +13,7 @@ import (
 	"strings"
 	"time"
 	"log"
+	"bytes"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -37,7 +38,8 @@ func main() {
 		Handle(ctx, res, req)
 	})
 
-	// Run Handle function every 10 seconds in a goroutine
+	// Run Handle function every 10 seconds in a goroutine (cron)
+	
 	// go func() {
 	// 	ticker := time.NewTicker(10 * time.Second)
 	// 	defer ticker.Stop()
@@ -116,35 +118,6 @@ func fetchDataFromDatabase() {
     // Access the reminders collection
     collection := client.Database(databaseName).Collection(collectionName)
 
-	
-	// Load the IST time zone
-
-	// istLocation, err := time.LoadLocation("Asia/Kolkata")
-	// if err != nil {
-	// 	log.Fatal("Error loading IST time zone:", err)
-	// 	return
-	// }
-
-	// // Get the current time in IST
-	// currentDate := time.Now().In(istLocation).Truncate(time.Minute)
-	// fmt.Printf("Current time: %v\n", currentDate)
-
-	// // Truncate seconds part
-	// currentDateIST := currentDate.Truncate(time.Minute)
-
-	// // Calculate the next minute to include records up to the next minute
-	// nextMinute := currentDateIST.Add(time.Minute)
-
-	// fmt.Println("Next minute: %v\n", nextMinute);
-
-	// // Define the filter to get all documents
-	// filter := bson.D{
-	// 	{"date", bson.D{
-	// 		{"$gte", currentDateIST},
-	// 		{"$lt", nextMinute},
-	// 	}},
-	// }
-
 	// Get the current time in UTC
 	currentDateUTC := time.Now().UTC().Truncate(time.Minute)
 
@@ -185,19 +158,57 @@ func fetchDataFromDatabase() {
 
     defer cursor.Close(ctx)
 
+	// Create a slice to hold the fetched reminders
+	var remindersList []*Reminder
+
     // Iterate over the cursor and print each reminder
     for cursor.Next(ctx) {
         var reminder *Reminder // Note the use of pointer here
         if err := cursor.Decode(&reminder); err != nil {
-            log.Fatal("Error decoding reminder document:", err)
+            log.Printf("Error decoding reminder document:", err)
             return
         }
+		remindersList = append(remindersList, reminder)
         fmt.Printf("Fetched Reminder: %+v\n", *reminder)
     }
 
     if err := cursor.Err(); err != nil {
-        log.Fatal("Error iterating over cursor:", err)
+        log.Printf("Error iterating over cursor:", err)
     }
+
+	// ... (your existing code)
+
+	// Create a map with the key "reminder" and the reminders list as the value
+	var remindersMap = map[string][]*Reminder{"reminder": remindersList}
+
+	// Marshal the map into JSON
+	jsonData, err := json.Marshal(remindersMap)
+	if err != nil {
+		log.Printf("Error marshaling reminders into JSON:", err)
+		return
+	}
+
+	// Create a buffer with the JSON data
+	buffer := bytes.NewBuffer(jsonData)
+
+	// Send a POST request to the specified endpoint
+	response, err := http.Post("http://localhost:5002/process", "application/json", buffer)
+	if err != nil {
+		log.Printf("Error sending POST request:", err)
+		return
+	}
+
+	defer response.Body.Close()
+
+	// Check the response status
+	if response.StatusCode != http.StatusOK {
+		log.Printf("Unexpected response status: %v", response.Status)
+		return
+	}
+
+	fmt.Println("Records sent successfully")
+
+
 }
 
 
@@ -220,12 +231,13 @@ func Handle(ctx context.Context, res http.ResponseWriter, req *http.Request) {
 		}
 
 		// Call processRemindersAndSendEvents asynchronously using a goroutine
-		go func() {
-			result := processRemindersAndSendEvents(jsonBodyStr)
-			fmt.Println(result)
-		}()
+
+		// go func() {
+		// 	result := processRemindersAndSendEvents(jsonBodyStr)
+		// 	fmt.Println(result)
+		// }()
 			
-		// fmt.Println(prettyPrint(req))      // echo to local output
+		fmt.Println("Request json, if any: "+jsonBodyStr)      // echo to local output
 		fmt.Fprintf(res, prettyPrint(req)) // echo to caller
 	} else {
 		fmt.Println("HTTP Request is nil\n")
