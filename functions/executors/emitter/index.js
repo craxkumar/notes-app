@@ -2,7 +2,7 @@ const { MongoClient } = require("mongodb");
 const axios = require("axios");
 async function connectToMongo() {
   try {
-    const MONGO_URI = "mongodb://localhost:27017/notes";
+    const MONGO_URI = "mongodb://localhost:27017/notes-db";
     const client = new MongoClient(MONGO_URI);
     await client.connect();
     console.log("Connected to MongoDB");

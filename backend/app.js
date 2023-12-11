@@ -93,7 +93,7 @@ app.post("/emitter", (req, res) => {
   try {
     console.log("hiiii", req.body);
     // Assuming you get the list of reminder objects in the request body
-    const reminderList = req.body;
+    const reminderList = req.body?.reminder;
 
     // Assuming each reminder in the list has a unique '_id' property
     reminderList.forEach((reminder) => {

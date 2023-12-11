@@ -1,13 +1,14 @@
 from flask import Flask, request, jsonify
 from pymongo import MongoClient, UpdateOne
 from bson import ObjectId
+import requests
 
 app = Flask(__name__)
 
 def update_reminders_as_expired(reminder_data_list):
     try:
         client = MongoClient('mongodb://localhost:27017/')
-        db = client['notes']
+        db = client['notes-db']
         reminders_collection = db['reminders']
 
         update_operations = []
@@ -39,7 +40,7 @@ def process_reminder():
 
 
         api_url = 'http://localhost:3001/emitter'
-        response = requests.post(api_url, jsonify(reminders))
+        response = requests.post(api_url, json={'reminder': reminders})
 
         if response.status_code == 200:
             print('Reminders processed successfully')

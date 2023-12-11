@@ -38,29 +38,71 @@ function App() {
     }
   }, [auth.isAuthenticated]);
 
-  useEffect(() => {
-    socket.on("notification", (data) => {
-      const existingScheduleIndex = schedules.findIndex(
-        (schedule) => schedule._id === data._id
-      );
+  // useEffect(() => {
+  //   if (schedules.length > 0) {
+  //     socket.on(auth?.user?.profile?.sub, (data) => {
+  //       console.log(data, schedules, "popopopop");
+  //       const existingScheduleIndex = schedules.findIndex(
+  //         (schedule) => schedule._id === data._id
+  //       );
 
-      if (existingScheduleIndex !== -1) {
-        var updatedSchedules = [...schedules];
-        updatedSchedules[existingScheduleIndex] = {
-          ...updatedSchedules[existingScheduleIndex],
-          ...data,
+  //       if (existingScheduleIndex !== -1) {
+  //         var updatedSchedules = [...schedules];
+  //         updatedSchedules[existingScheduleIndex] = {
+  //           ...updatedSchedules[existingScheduleIndex],
+  //           ...data,
+  //         };
+  //       }
+  //       setSchedules(updatedSchedules);
+  //       toastIdRef.current = toast({
+  //         title: `It's Time for ${data.title}`,
+  //         status: "success",
+  //         duration: 5000,
+  //         variant: "left-accent",
+  //         isClosable: true,
+  //       });
+  //     });
+  //   }
+  // });
+
+  useEffect(() => {
+    if (schedules.length > 0 && socket) {
+      socket.on(auth?.user?.profile?.sub, (data) => {
+        console.log(data, schedules, "popopopop");
+        var dataObject = {
+          _id: data._id.$oid,
+          title: data.title,
+          description: data.description,
+          user_id: data.user_id,
+          expired: data.expired,
+          date: data.date.$date,
+          createdAt: data.createdAt.$date,
+          updatedAt: data.updatedAt.$date,
+          __v: data.__v,
         };
-      }
-      setSchedules(updatedSchedules);
-      toastIdRef.current = toast({
-        title: `It's Time for ${data.title}`,
-        status: "success",
-        duration: 5000,
-        variant: "left-accent",
-        isClosable: true,
+        const existingScheduleIndex = schedules.findIndex(
+          (schedule) => schedule._id === dataObject._id
+        );
+
+        if (existingScheduleIndex !== -1) {
+          var updatedSchedules = [...schedules];
+          updatedSchedules[existingScheduleIndex] = {
+            ...updatedSchedules[existingScheduleIndex],
+            ...data,
+          };
+          console.log(updatedSchedules, "lplplpl");
+          setSchedules(updatedSchedules);
+          toastIdRef.current = toast({
+            title: `It's Time for ${data.title}`,
+            status: "success",
+            duration: 5000,
+            variant: "left-accent",
+            isClosable: true,
+          });
+        }
       });
-    });
-  });
+    }
+  }, [schedules, socket, auth]);
 
   return (
     <Router className="flex h-screen">
