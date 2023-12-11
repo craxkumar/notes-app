@@ -6,7 +6,6 @@ app = Flask(__name__)
 
 def update_reminders_as_expired(reminder_data_list):
     try:
-        print('hello')
         client = MongoClient('mongodb://localhost:27017/')
         db = client['notes']
         reminders_collection = db['reminders']
@@ -32,18 +31,14 @@ def hello():
 @app.route('/process', methods=['POST'])
 def process_reminder():
     try:
-        print("hiiiiiii")
-        print(request.json.get('reminder'))
         reminders = request.json.get('reminder', [])
-        print(reminders)
-
         update_reminders_as_expired(reminders)
 
         for reminder in reminders:
             reminder['expired'] = True
 
 
-        print('Reminders processed successfully:', reminders)
+        print('Reminders processed successfully:', jsonify(reminders))
 
         return jsonify(reminders), 200
     except Exception as e:
