@@ -5,6 +5,7 @@ import Navbar from "./Navbar";
 import socketIO from "socket.io-client";
 import { useToast } from "@chakra-ui/react";
 import Dashboard from "./Dashboard.js";
+import PrivateRoute from "./config/auth/privateRoute.js";
 const socket = socketIO.connect("http://localhost:4000");
 function App() {
   const [schedules, setSchedules] = useState([]);
@@ -38,7 +39,9 @@ function App() {
       <Navbar socket={socket} schedules={schedules} />
       <Switch>
         <Route exact path="/dashboard">
-          <Dashboard schedules={schedules} />
+          <PrivateRoute>
+            <Dashboard schedules={schedules} />
+          </PrivateRoute>
         </Route>
         {/* <Route exact path="/profile"> */}
         {/* <Profile /> */}
