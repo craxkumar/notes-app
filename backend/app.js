@@ -98,7 +98,7 @@ app.post('/emitter', (req, res) => {
 
         // Assuming each reminder in the list has a unique '_id' property
         reminderList.forEach(reminder => {
-            // Emitting data with the '_id' as the event name
+            // Emitting data with the 'user_id' as the event name
             io.emit(reminder.user_id, reminder);
         });
 
